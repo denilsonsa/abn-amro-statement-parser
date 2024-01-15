@@ -1,0 +1,49 @@
+# This file is an anonymized sample of statements from ABN AMRO transactions.
+# Each transaction in this sample still has the same format as the original,
+# but the data has been scrambled to be anonymized.
+#
+# The downloaded files have the following naming format: TXT231231235959.TAB
+# The numbers in the filename are the date-time of the download: %y%m%d%H%M%S
+#
+# The original file contains one transaction per line, each line with tab-separated columns.
+# This sample file adds empty lines and comment lines, for convenience and ease-of-use.
+
+
+# Older transactions look like these:
+
+123456789	EUR	20211230	3025,00	3000,00	20211230	-25,00	BEA   NR:A1B23C   30.12.21/09.15 Hema EV123,PAS123               ZAANDAM                                                          
+123456789	EUR	20211230	3000,00	3025,00	20211230	25,00	BEA   NR:A1B23C   30.12.21/15.01 Hema EV123,PAS123               ZAANDAM                          TERUGBOEKING-BEA-TRANSACTIE     
+123456789	EUR	20211231	3000,00	2993,50	20211231	-6,50	BEA   NR:AB012345 31.12.21/12.12 CCV TRAVERSE P1,PAS456          LUCHTH SCHIPH                                                    
+
+# Newer transactions look like these:
+
+123456789	EUR	20221220	3500,00	3493,00	20231218	-7,00	ABN AMRO Bank N.V.               CreditCard                  1,70Cr.CardExtra                1,00 Basic Package               2,90Debit card                  1,40                                 
+123456789	EUR	20230202	3493,00	3454,65	20230202	-39,35	SEPA iDEAL                       IBAN: NL01RABO0123456789        BIC: RABONL2U                    Naam: Next to Pay via Mollie    Omschrijving: M01234567ABCDE0F 0 123456789012345 Foobar Pizza Delivery Order 123456               Kenmerk: 02-02-2023 17:01 0123456789012345                                                       
+123456789	EUR	20230203	3454,65	3443,40	20230203	-11,25	SEPA Incasso algemeen doorlopend Incassant: NL01ZZZ012345678901  Naam: FOO BAR FIZZ BUZZ FOOBAR   Machtiging: 012345678901        Omschrijving: Factuur: 012345678 901                             IBAN: NL01ABNA0123456789         Kenmerk: 012345678901           Voor: J SMITH VAN DE FOOBAR CJ                                   
+123456789	EUR	20230203	3443,40	3427,41	20230203	-15,99	SEPA Incasso algemeen doorlopend Incassant: GB98NFXSDDCHAS01234567890123                          Naam: NETFLIX INTERNATIONAL B.V.Machtiging: DD-01234567890123456 7-890-123456                    Omschrijving: Netflix Monthly Su bscription                      IBAN: LU012345678901234567                                       
+123456789	EUR	20230203	3427,41	3427,00	20230203	-0,41	SEPA Incasso algemeen eenmalig   Incassant: NL01ZZZ012345678901  Naam: Association Foobar fiz BUZ Z by Fobar                      Machtiging: A0B1C2D3E4F5G6H7     Omschrijving: Association Foobar fiz BUZZ 01234567 89ab cdef 012 3 456789abcdef:01234567 89ab cdef 0123 456789abcdef                                              
+123456789	EUR	20230210	3427,00	2000,00	20230210	-1427,00	SEPA Overboeking                 IBAN: NL01ABNA0123456789        BIC: ABNANL2A                    Naam: J SMITH VAN DE FOOBAR CJ  
+123456789	EUR	20230210	2000,00	1975,00	20230210	-25,00	SEPA Overboeking                 IBAN: NL01RABO0123456789        BIC: RABONL2U                    Naam: Praktijk Foobar           Omschrijving: nota nr 0123456789 0 - Fizzbuzz                    
+123456789	EUR	20230212	1975,00	1775,00	20230212	-200,00	GEA, Betaalpas                   Geldmaat Somewhere 22,PAS123    NR:012345, 12.02.23/17:55        Somewhere                       
+123456789	EUR	20230213	1775,00	1784,99	20230213	9,99	BEA, Betaalpas                   IKEA Amsterdam,PAS123           NR:0ABC0D, 13.02.23/14:37        AMSTERDAM                       TERUGBOEKING BEA-TRANSACTIE                                      
+123456789	EUR	20230213	1784,99	1750,50	20230213	-34,49	BEA, Betaalpas                   IKEA Amsterdam,PAS123           NR:0ABC0D, 13.02.23/14:50        AMSTERDAM                       
+123456789	EUR	20230214	1750,50	1731,50	20230214	-19,00	BEA, Betaalpas                   Zettle_*The Whatever S,PAS456   NR:01234567, 14.02.23/11:11      Eindhoven, No                   
+123456789	EUR	20230215	1731,50	1720,50	20230215	-11,00	BEA, Betaalpas                   TUIFLY NL,PAS123                NR:01234567, 15.02.23/08:14      SCHIPHOL RIJK, Land: IRL        
+123456789	EUR	20230215	1720,50	1650,50	20230215	-70,00	BEA, Betaalpas                   AB CDEFGHIJ,PAS456              NR:01234567, 15.02.23/12:46      KLEOPATRAS 5, Land: GRC         
+123456789	EUR	20230215	1650,50	1610,00	20230215	-40,50	BEA, Betaalpas                   SSP FOOBAR BURGER KI,PAS456     NR:01234567, 15.02.23/14:17      KRATIKOS AERO, Land: GRC        
+123456789	EUR	20230220	1610,00	1598,29	20230220	-11,71	BEA, Google Pay                  SumUp  *European Fooba,PAS456   NR:01234567, 20.12.23/11:59      Gateshead, Land: GBR            GBP 10,00 1EUR=0,8539 GBP        KOSTEN EUR0,15 ACHTERAF BEREKEND
+123456789	EUR	20230220	1598,29	1597,00	20230220	-1,29	BEA, Google Pay                  NLOVAB1C2D3E4F5G6H,PAS456       NR:AB12CD34, 20.02.23/12:59      www.ovpay.nl                    
+123456789	EUR	20230220	1597,00	1596,20	20230220	-0,80	BEA, Google Pay                  PiPi H'dorp De Brug Li,PAS456   NR:AB123C, 20.02.23/13:31        HOOFDDORP                       
+
+# For whatever reason, very recent transactions sometimes get listed as a slash-separated description:
+
+123456789	EUR	20231231	1500,00	1761,75	20231231	261,75	/TRTP/SEPA OVERBOEKING/IBAN/NL01RABO0123456789/BIC/RABONL2U/NAME/FizzBuz Foobarfizbuzbank/REMI/FOOBAR FIZZ BUZZ Stuff. 12 3456789012 WWW.FOOBAR.NL Foo Foobarfizbuzbank/EREF/Z01234567890123456789012                                                            
+123456789	EUR	20231231	1761,75	1750,00	20231231	-11,75	/TRTP/SEPA Incasso algemeen doorlopend/CSID/NL00ZZZ123456789012/NAME/Albert Heijn B.V./MARF/AH012345678901234567890123456789012/REMI/Foobarment Foobar Fobar - AB012345678/IBAN/NL00INGB0123456789/BIC/INGBNL2A/EREF/AB0123456789                              
+123456789	EUR	20231231	1750,00	1742,50	20231231	-7,50	/TRTP/iDEAL/IBAN/NL01ABNA0123456789/BIC/ABNANL2A/NAME/Tikkie Zakelijk/REMI/B20230101X00ABCD012345678901 0123456789012345 Fizzbuzz Foo Bar NL02ABNA1234567890 Tikkie Zakelijk/EREF/31-12-2023 13:37 0123456789012345
+
+# Multiple accounts can be included in the same file.
+# This is also the case of the original downloaded files.
+
+112233445	EUR	20221201	10000,00	8000,00	20221201	-2000,00	SEPA Overboeking                 IBAN: NL01ABNA0123456789        BIC: ABNANL2A                    Naam: J SMITH VAN DE FOOBAR CJ  
+112233445	EUR	20230210	8000,00	9427,00	20230210	1427,00	SEPA Overboeking                 IBAN: NL01ABNA0123456789        BIC: ABNANL2A                    Naam: J SMITH VAN DE FOOBAR CJ  
+112233445	EUR	20231230	9427,00	9550,99	20231231	123,01	Basic interest                   over the period from            31-12-2022 to 31-12-2023         For interest rates please visit www.abnamro.nl/rente                                             
