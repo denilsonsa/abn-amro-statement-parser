@@ -767,9 +767,7 @@ def parse_description(s):
             "ID": "",
         }
         data = dict(
-            (key_map[k], v.rstrip())
-            for (k, v) in batched(parts, 2)
-            if key_map[k] != ""
+            (key_map[k], v.rstrip()) for (k, v) in batched(parts, 2) if key_map[k] != ""
         )
         if data["type"] == "iDEAL":
             # To make it consistent with the other format.
@@ -799,7 +797,9 @@ def parse_description(s):
             location = tail[32:64]
             suffix = tail[64:]
 
-            type, nr, dtstr = re.fullmatch(r"^(BEA) +NR:([^ ]+) +([0-9./:]+)$", head).groups()
+            type, nr, dtstr = re.fullmatch(
+                r"^(BEA) +NR:([^ ]+) +([0-9./:]+)$", head
+            ).groups()
             name, _, pas = name_and_card.partition(",PAS")
             dt = parse_nr_datetime(dtstr)
             return {
@@ -820,7 +820,9 @@ def parse_description(s):
             suffix = tail[96:]
 
             name, _, pas = name_and_card.partition(",PAS")
-            nr, dtstr = re.fullmatch(r"^NR:([^, ]+)[, ]+([0-9./:]+) *", nr_and_date).groups()
+            nr, dtstr = re.fullmatch(
+                r"^NR:([^, ]+)[, ]+([0-9./:]+) *", nr_and_date
+            ).groups()
             dt = parse_nr_datetime(dtstr)
 
             return {
@@ -855,7 +857,7 @@ def parse_description(s):
                     parts.append((key, value + thirtytwo))
             return {
                 "type": head,
-                **{k: v.strip() for (k,v) in parts},
+                **{k: v.strip() for (k, v) in parts},
             }
         elif re.match(r"^CREDIT INTEREST", head):
             # Legacy, old format for savings account interest.
@@ -869,7 +871,9 @@ def parse_description(s):
                 "type": head,
                 "description": re.sub(r" +", " ", tail),
             }
-        elif re.match(r"^(Maandpremie |Uitbetaling pakketkorting|PAKKETVERZ\. POLISNR\.)", head):
+        elif re.match(
+            r"^(Maandpremie |Uitbetaling pakketkorting|PAKKETVERZ\. POLISNR\.)", head
+        ):
             # Legacy, old format for insurance costs.
             return {
                 "type": "legacy insurance",
@@ -947,4 +951,5 @@ def convert_tsv_to_json_like(filename):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
