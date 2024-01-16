@@ -176,6 +176,11 @@ class Transaction:
         )
 
     @property
+    def amount_formatted(self):
+        """The amount of money, formatted in a simple way."""
+        return money_format(self.amount)
+
+    @property
     def desc(self):
         """Dict object with the parsed description.
 
