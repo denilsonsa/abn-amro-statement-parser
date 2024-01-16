@@ -4,12 +4,15 @@ Parser for the Dutch [ABN AMRO bank](https://www.abnamro.nl/) transactions.
 
 This project supports the `TXT*.TAB` files, which are tab-separated values. This project may still be useful while parsing the other available file formats.
 
-## How to "install" this project
-
-* Download the [abnamrotsvparser.py](abnamrotsvparser.py) and save it anywhere.
-* Install the [required Python libraries](https://pip.pypa.io/en/stable/user_guide/#requirements-files). Consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to keep everything tidy.
-
 ## How to use this project
+
+Consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to keep everything tidy. Then:
+
+```bash
+pip install git+https://github.com/denilsonsa/abn-amro-tsv-parser.git
+```
+
+Alternatively, you can manually download the [abnamrotsvparser/](abnamrotsvparser/) directory and place it wherever you want.
 
 ```python
 import abnamrotsvparser
