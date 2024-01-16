@@ -373,6 +373,19 @@ def parse_description(s):
 
     >>> test_it(" ".join([
     ...     "ABN AMRO Bank N.V.              ",
+    ...     "Credit Card                 1,70CreditCard(2)               1,00",
+    ...     "Basic Package               1,70Debit card                  1,40",
+    ...     "Debit card                  1,40",
+    ... ]))
+    {
+      "Basic Package": "1.70",
+      "Credit Card": "1.70",
+      "CreditCard(2)": "1.00",
+      "Debit card": "1.40",
+      "type": "ABN AMRO Bank N.V."
+    }
+    >>> test_it(" ".join([
+    ...     "ABN AMRO Bank N.V.              ",
     ...     "CreditCard                  1,70Cr.CardExtra                1,00",
     ...     "Basic Package               2,95Debit card                  1,40",
     ...     "                                ",
