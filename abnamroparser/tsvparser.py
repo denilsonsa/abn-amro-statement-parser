@@ -265,9 +265,11 @@ def rejoin_description(s):
         # Spaces are inserted every 32 or 64 characters.
         # It's annoying.
         head = s[:32]
-        assert s[32] == " "
+        assert s[32] == " ", "Expected space at the 32th position"
         parts = re.findall(r".{1,64} ?", s[33:].rstrip())
-        assert all(len(p) == 65 for p in parts[:-1])
+        assert all(
+            len(p) == 65 for p in parts[:-1]
+        ), "Expected all parts to have exactly 65 chars (except that last one)"
         return "".join([head, *[p[:64] for p in parts]])
 
 
