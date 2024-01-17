@@ -796,7 +796,7 @@ def parse_description(s):
     else:
         head = s[:32].rstrip()
         tail = s[32:].rstrip()
-        if s.startswith("ABN AMRO Bank"):
+        if head.startswith("ABN AMRO Bank"):
             # Bank fees.
             parts = re.findall(r".{1,32}", tail)
             costs = dict(
