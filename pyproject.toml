@@ -1,11 +1,18 @@
 [project]
-name = "abn-amro-tsv-parser"
+name = "abn-amro-statement-parser"
 version = "0.9.0"
 description = "Parser for the Dutch ABN AMRO bank transactions"
-keywords = ["ABN AMRO", "bank statement", "bank transactions", "bank mutations", "TSV"]
+keywords = ["ABN AMRO", "bank statement", "bank transactions", "bank mutations", "TSV", "credit card"]
 requires-python = ">=3.8"
 dependencies = [
     "py-moneyed",
+
+	# Technically, pypdf is an optional dependency. But in practice
+	# I don't want to go to the trouble of configuring optional
+	# dependencies, nor force this trouble to the end-users.
+	# So, everyone gets to install it. Which is simple enough,
+	# as it is a pure-python module with no mandatory dependencies.
+    "pypdf",
 ]
 authors = [
     { name="Denilson Sá Maia", email="denilsonsa@gmail.com" },
@@ -22,7 +29,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/denilsonsa/abn-amro-tsv-parser"
+Homepage = "https://github.com/denilsonsa/abn-amro-statement-parser"
 
 [build-system]
 requires = ["setuptools>=61.0"]

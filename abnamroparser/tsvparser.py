@@ -42,7 +42,7 @@ except ImportError:
 #     "description",  # <- This is annoying to parse
 # ]
 
-# The files named like `TXT123456789012.TAB` are TSV (tab-separated values).
+# The files named like `TXT231122235959.TAB` are TSV (tab-separated values).
 # The column order in the TSV is:
 HEADERS = [
     "accountNumber",

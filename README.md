@@ -1,4 +1,4 @@
-# abn-amro-tsv-parser
+# abn-amro-statement-parser
 
 Parser for the Dutch [ABN AMRO bank](https://www.abnamro.nl/) transactions.
 
@@ -9,17 +9,17 @@ This project supports the `TXT*.TAB` files, which are tab-separated values. This
 Consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to keep everything tidy. Then:
 
 ```bash
-pip install git+https://github.com/denilsonsa/abn-amro-tsv-parser.git
+pip install git+https://github.com/denilsonsa/abn-amro-statement-parser.git
 ```
 
-Alternatively, you can manually download the [abnamrotsvparser/](abnamrotsvparser/) directory and place it wherever you want.
+Alternatively, you can manually download any module from the [abnamroparser/](abnamroparser/) directory and place it wherever you want.
 
 ```python
-import abnamrotsvparser
+from abnamroparser import tsvparser
 
 # You can iterate over the transactions of a certain file:
 with open("TXT_SAMPLE.TAB") as f:
-    for transaction in abnamrotsvparser.read_tsv(f):
+    for transaction in tsvparser.read_tsv(f):
         print(
             "{!s:12} {:32} {}".format(
                 transaction.amount,
@@ -32,7 +32,7 @@ with open("TXT_SAMPLE.TAB") as f:
 import json
 with open("converted.json", "w") as f:
     json.dump(
-        abnamrotsvparser.convert_tsv_to_json_like("TXT_SAMPLE.TAB"),
+        tsvparser.convert_tsv_to_json_like("TXT_SAMPLE.TAB"),
         f,
         indent=2,
         sort_keys=True,
@@ -41,7 +41,7 @@ with open("converted.json", "w") as f:
 
 I encourage you to take a look at the source-code. It's full of [doctests](https://docs.python.org/3/library/doctest.html), so it should be easy to learn.
 
-## About the available file formats
+## About the available file formats from ABN AMRO
 
 You can download your transactions from the ABN AMRO internet banking website:
 
@@ -67,17 +67,17 @@ Basic PDF file, well formatted to look pretty in a paper statement.
 
 ### TXT
 
-Sample filename: `TXT231231235959.TAB`
+Sample filename: `TXT231122235959.TAB`
 
 The date and time of the download is part of the filename, following the `TXT%y%m%d%H%M%S.TAB` format.
 
 It is a tab-separated file without any headers. The columns are the same as the XLS Excel file, but in a slightly different order.
 
-Use [abnamrotsvparser.py](abnamrotsvparser.py) to parse this kind of file.
+Use [tsvparser](abnamroparser/tsvparser.py) to parse this kind of file.
 
 ### MT940
 
-Sample filename: `MT940231231235959.STA`
+Sample filename: `MT940231122235959.STA`
 
 The date and time of the download is part of the filename, following the `MT940%y%m%d%H%M%S.STA` format.
 
@@ -87,7 +87,7 @@ Use the [mt-940](https://github.com/WoLpH/mt940) ([PyPI](https://pypi.org/projec
 
 ### XLS
 
-Sample filename: `XLS231231235959.xls`
+Sample filename: `XLS231122235959.xls`
 
 The date and time of the download is part of the filename, following the `XLS%y%m%d%H%M%S.xls` format.
 
