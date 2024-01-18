@@ -1,11 +1,11 @@
 #!/bin/env python3
 
 import csv
+import datetime
 import os.path
 import re
 from collections import namedtuple
 from dataclasses import dataclass
-from datetime import datetime, date
 from moneyed import Currency, Money
 
 try:
@@ -101,7 +101,7 @@ class Transaction:
     # The date of the transaction.
     # There is also the "value date" which is ignored here because it is rarely
     # different than the "transaction date".
-    date: date
+    date: datetime.date
     # An arbitrary incrementing number to keep the order of the transactions
     # from the same day. It can be initialized as the row number from the
     # imported file.
@@ -139,7 +139,7 @@ class Transaction:
 
         >>> sample_data = {
         ...     "account": [1234, 5678],
-        ...     "date": [date(2024, 1, 1), date(2024, 1, 2)],
+        ...     "date": [datetime.date(2024, 1, 1), datetime.date(2024, 1, 2)],
         ...     "order": [1, 2],
         ...     "currency": [Currency("EUR"), Currency("USD")],
         ...     "amount": [Money("-12.34", "EUR"), Money("12.34", "USD")],
@@ -286,7 +286,7 @@ def parse_nr_datetime(s):
     """
     parts = re.split("[-:./]", s.strip())
     dd, mm, yy, HH, MM = [int(p) for p in parts]
-    return datetime(2000 + yy, mm, dd, HH, MM)
+    return datetime.datetime(2000 + yy, mm, dd, HH, MM)
 
 
 def parse_description(s):
@@ -947,7 +947,7 @@ def read_tsv(file):
         cur = Currency(row.mutationcode)
         yield Transaction(
             account=int(row.accountNumber),
-            date=datetime.strptime(row.transactiondate, "%Y%m%d").date(),
+            date=datetime.datetime.strptime(row.transactiondate, "%Y%m%d").date(),
             # Ignoring row.valuedate.
             order=order,
             currency=cur,
