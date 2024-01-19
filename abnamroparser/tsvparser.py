@@ -4,6 +4,7 @@ import csv
 import datetime
 import os.path
 import re
+from .util import filter_comments, money_format
 from collections import namedtuple
 from dataclasses import dataclass
 from moneyed import Currency, Money
@@ -57,33 +58,6 @@ HEADERS = [
 
 # This named tuple contains the raw data directly read from the TSV file.
 RowTuple = namedtuple("RowTuple", HEADERS)
-
-
-def money_format(m: Money):
-    """Given a moneyed.Money class, returns a sane and simple string representation.
-
-    Rounding is arbitrary towards cents. I'm not working on any amount smaller
-    than cents, so I'm not worrying about it.
-
-    It doesn't respect locales, it always uses `.` as the decimal separator.
-    The objective is to have a human-readable but also machine-readable money value.
-
-    >>> money_format(Money("0.001", "EUR"))
-    '0.00'
-    >>> money_format(Money("0.012", "EUR"))
-    '0.01'
-    >>> money_format(Money("0.99", "EUR"))
-    '0.99'
-    >>> money_format(Money("1", "EUR"))
-    '1.00'
-    >>> money_format(Money("999", "EUR"))
-    '999.00'
-    >>> money_format(Money("1000", "EUR"))
-    '1000.00'
-    >>> money_format(Money("1234567.89", "EUR"))
-    '1234567.89'
-    """
-    return "{:.2f}".format(m.amount)
 
 
 @dataclass
@@ -917,30 +891,6 @@ def parse_description(s):
             }
 
 
-def filter_comments(iterable):
-    """Filters out comment lines and empty lines.
-
-    This is useful when passing a file-like object as the iterable.
-
-    >>> list(filter_comments([
-    ...     "",
-    ...     "first",
-    ...     "",
-    ...     "# foo",
-    ...     "second",
-    ...     "     # foo",
-    ...     "last",
-    ... ]))
-    ['first', 'second', 'last']
-    """
-    for line in iterable:
-        if line.lstrip().startswith("#"):
-            continue
-        if line.strip() == "":
-            continue
-        yield line
-
-
 def read_tsv(file):
     """Reads and parses a TSV file, generating Transaction objects.
 
@@ -974,6 +924,9 @@ def convert_tsv_to_json_like(filename):
     Given a filename, it will parse all the transactions and return a list of
     dicts, a structure that can be easily serialized as JSON for later storage
     (or later processing using jq).
+
+    I'm not sure if this function is very valuable. I'm considering deleting
+    it, or making it better and making it work also for the other parsers.
     """
     with open(os.path.expanduser(filename)) as f:
         return [r.as_json_like for r in read_tsv(f)]
