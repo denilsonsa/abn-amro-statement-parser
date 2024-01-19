@@ -1,5 +1,3 @@
-#!/bin/env python3
-
 from dataclasses import dataclass
 from moneyed import Money
 
@@ -93,9 +91,3 @@ def money_format(m: Money):
     '1234567.89'
     """
     return "{:.2f}".format(m.amount)
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()

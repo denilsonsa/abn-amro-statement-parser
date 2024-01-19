@@ -1,5 +1,3 @@
-#!/bin/env python3
-
 import csv
 import datetime
 import os.path
@@ -930,9 +928,3 @@ def convert_tsv_to_json_like(filename):
     """
     with open(os.path.expanduser(filename)) as f:
         return [r.as_json_like for r in read_tsv(f)]
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()

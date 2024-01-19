@@ -1,5 +1,3 @@
-#!/bin/env python3
-
 import datetime
 import re
 from .util import interval, first, money_format
@@ -637,9 +635,3 @@ def read_ics_pdf(filename):
         page.extract_text(visitor_text=p.visitor)
 
     yield from get_transactions_from_pages(pages)
-
-
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
