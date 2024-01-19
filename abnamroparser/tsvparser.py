@@ -181,6 +181,16 @@ class Transaction:
         return money_format(self.amount)
 
     @property
+    def start_saldo_formatted(self):
+        """The start_saldo, formatted in a simple way."""
+        return money_format(self.start_saldo)
+
+    @property
+    def end_saldo_formatted(self):
+        """The end_saldo, formatted in a simple way."""
+        return money_format(self.end_saldo)
+
+    @property
     def desc(self):
         """Dict object with the parsed description.
 
@@ -214,9 +224,9 @@ class Transaction:
             "date": self.date.isoformat(),
             "order": self.order,
             "currency": self.currency.code,
-            "amount": money_format(self.amount),
-            "start_saldo": money_format(self.start_saldo),
-            "end_saldo": money_format(self.end_saldo),
+            "amount": self.amount_formatted,
+            "start_saldo": self.start_saldo_formatted,
+            "end_saldo": self.end_saldo_formatted,
             "description": self.description,  # raw description string
             "desc": self.desc,  # parsed description as a dict
         }

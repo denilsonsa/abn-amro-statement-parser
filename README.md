@@ -4,6 +4,8 @@ Parser for the Dutch [ABN AMRO bank](https://www.abnamro.nl/) transactions.
 
 This project supports the `TXT*.TAB` files, which are tab-separated values. This project may still be useful while parsing the other available file formats.
 
+This project also supports the `Statement-*.pdf` [ICS credit card](https://www.icscards.nl/abnamrogb) statements. (ICS is the credit card company that provides ABN-AMRO-branded credit cards.)
+
 ## How to use this project
 
 Consider using a [virtual environment](https://docs.python.org/3/library/venv.html) to keep everything tidy. Then:
@@ -21,7 +23,8 @@ from abnamroparser import tsvparser
 with open("TXT_SAMPLE.TAB") as f:
     for transaction in tsvparser.read_tsv(f):
         print(
-            "{!s:12} {:32} {}".format(
+            "{} {!s:12} {:32} {}".format(
+                transaction.date.isoformat(),
                 transaction.amount,
                 transaction.desc["type"],
                 transaction.desc.get("Naam", "?"),
@@ -30,9 +33,43 @@ with open("TXT_SAMPLE.TAB") as f:
 
 # Or you can easily convert it to a JSON file:
 import json
-with open("converted.json", "w") as f:
+with open("bank_transactions.json", "w") as f:
     json.dump(
         tsvparser.convert_tsv_to_json_like("TXT_SAMPLE.TAB"),
+        f,
+        indent=2,
+        sort_keys=True,
+    )
+```
+
+```python
+import glob
+from abnamroparser import icspdfparser
+
+# Parsing ICS credit card statements:
+for pdf_filename in sorted(glob.glob("Statement-*.pdf")):
+    for transaction in icspdfparser.read_ics_pdf(pdf_filename):
+        print(
+            "{} {!s:12} {:24} {}".format(
+                transaction.date.isoformat(),
+                transaction.amount,
+                transaction.descriptions[0],
+                transaction.descriptions[1],
+            )
+        )
+
+# Or you can easily convert it to a JSON file:
+import json
+from itertools import chain
+with open("credit_card_transactions.json", "w") as f:
+    json.dump(
+        [
+            transaction.as_json_like
+            for transaction in chain.from_iterable(
+                icspdfparser.read_ics_pdf(pdf_filename)
+                for pdf_filename in sorted(glob.glob("Statement-*.pdf"))
+            )
+        ],
         f,
         indent=2,
         sort_keys=True,
@@ -140,11 +177,49 @@ Thus, there is no single "best" format, it depends on your needs:
 * *XLS* is the best all-around format if you don't mind reading from a proprietary binary format.
 * *CAMT. 053* is adequate if you want machine-readable files without proprietary formats.
 
+## About the available file formats from ICS
+
+The [Creditcard Online](https://www.icscards.nl/abnamrogb/login) self-service website only provides the monthly credit card statements in PDF format.
+
+Sample filename: `Statement-01234567890-2023-11.pdf`
+
+The text in those files is easily extractable thanks to the [pypdf](https://github.com/py-pdf/pypdf) library.
+
+### Rant about PDF file sizes
+
+Over time, the PDF files grew in size.
+
+| average file size | 1 page  | 2 pages | 3 pages |
+|-------------------|---------|---------|---------|
+| Before 2023-02    | 446 KiB | 887 KiB |    ?    |
+| After 2023-03     | 1.8 MiB | 3.5 MiB |    ?    |
+
+If we extract the JPG images from those PDF files, we can easily see the difference:
+
+```console
+$ pdfimages -j Statement-01234567890-2023-02.pdf OLD
+$ pdfimages -j Statement-01234567890-2023-03.pdf NEW
+$ ls -1Ush OLD* NEW*
+444K OLD-000.jpg
+1,8M NEW-000.jpg
+$ identifi OLD* NEW*
+JPEG TrueColor 8-bit srgb  3.0 (JPEG 90) 2480x3507 pixels 8.7MP (210x297mm 300dpi) TopLeft orientation 450961 bytes: OLD-000.jpg
+JPEG TrueColor 8-bit srgb  3.0 (JPEG 100) 2480x3507 pixels 8.7MP (875x1237mm 72dpi) 1782810 bytes: NEW-000.jpg
+```
+
+Where [identifi](https://github.com/denilsonsa/small_scripts/blob/master/identifi) is a fancy wrapper around ImageMagick's `identify`.
+
+So, for each 3KB of useful text we are receiving from half megabyte to almost two megabytes… per page! And what's that image? It's just a full-page background. It's such a huge waste of space. We would need a decade of plain text statements to come close to the size of a single month.
+
+And why did the size increase? Because they changed the logo at the top, which means someone had to re-create the JPEG image, and the image was exported in the maximum possible quality, even though there is no perceived quality difference to the human eye.
+
+I'm pretty sure the PDF would be noticeably smaller if they used vector graphics. They could even get rid of the subtle circle pattern in the background, as I don't think it serves any real purpose. Just for comparison, the Internet Banking can generate plain boring PDF bank statements (that are hard to parse), and a full year of those statements is around 2 MiB, and those statements have many more pages and more transactions than each credit card statement.
+
 ## Project status
 
-I created this for my own uses. I'm sharing with the world because I believe
-more people are in the same situation as me, and more people certainly want to
-parse their own bank account statements.
+I created this code for my own uses. I'm sharing with the world because I
+believe more people are in the same situation as me, and more people certainly
+want to parse their own bank account statements.
 
 That said, I don't plan on improving this code much. I'll fix it and update it
 as much as I need for my own statements. Simple pull requests are welcome.
