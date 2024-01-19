@@ -768,9 +768,7 @@ def parse_description(s):
             "ORDP": "",
             "ID": "",
         }
-        data = dict(
-            (key_map[k], v.rstrip()) for (k, v) in batched(parts, 2) if key_map[k] != ""
-        )
+        data = {key_map[k]: v.rstrip() for (k, v) in batched(parts, 2) if key_map[k] != ""}
         if data["type"] == "iDEAL":
             # To make it consistent with the other format.
             data["type"] = "SEPA iDEAL"
@@ -783,12 +781,10 @@ def parse_description(s):
         if head.startswith("ABN AMRO Bank"):
             # Bank fees.
             parts = re.findall(r".{1,32}", tail)
-            costs = dict(
-                (k, v.replace(",", "."))
-                for (k, v) in (
-                    re.fullmatch(r"^(.*[^ ]) +([-0-9,.]+)$", p).groups() for p in parts
-                )
-            )
+            costs = {
+                k: v.replace(",", ".")
+                for (k, v) in (re.fullmatch(r"^(.*[^ ]) +([-0-9,.]+)$", p).groups() for p in parts)
+            }
             return {
                 "type": head,
                 **costs,
@@ -799,9 +795,7 @@ def parse_description(s):
             location = tail[32:64]
             suffix = tail[64:]
 
-            type, nr, dtstr = re.fullmatch(
-                r"^(BEA) +NR:([^ ]+) +([0-9./:]+)$", head
-            ).groups()
+            type, nr, dtstr = re.fullmatch(r"^(BEA) +NR:([^ ]+) +([0-9./:]+)$", head).groups()
             name, _, pas = name_and_card.partition(",PAS")
             dt = parse_nr_datetime(dtstr)
             return {
@@ -822,9 +816,7 @@ def parse_description(s):
             suffix = tail[96:]
 
             name, _, pas = name_and_card.partition(",PAS")
-            nr, dtstr = re.fullmatch(
-                r"^NR:([^, ]+)[, ]+([0-9./:]+) *", nr_and_date
-            ).groups()
+            nr, dtstr = re.fullmatch(r"^NR:([^, ]+)[, ]+([0-9./:]+) *", nr_and_date).groups()
             dt = parse_nr_datetime(dtstr)
 
             return {
@@ -873,9 +865,7 @@ def parse_description(s):
                 "type": head,
                 "description": re.sub(r" +", " ", tail),
             }
-        elif re.match(
-            r"^(Maandpremie |Uitbetaling pakketkorting|PAKKETVERZ\. POLISNR\.)", head
-        ):
+        elif re.match(r"^(Maandpremie |Uitbetaling pakketkorting|PAKKETVERZ\. POLISNR\.)", head):
             # Legacy, old format for insurance costs.
             return {
                 "type": "legacy insurance",

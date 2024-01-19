@@ -17,6 +17,7 @@ class interval:
     >>> 2.0 in interval(0, 2)
     False
     """
+
     low: float
     high: float
 

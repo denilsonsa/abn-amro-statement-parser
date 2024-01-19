@@ -9,45 +9,50 @@ from pypdf import PdfReader
 
 MONTHS_LONG = {
     name: nr
-    for nr, name in enumerate([
-        "januari",
-        "februari",
-        "maart",
-        "april",
-        "mei",
-        "juni",
-        "juli",
-        "augustus",
-        "september",
-        "oktober",
-        "november",
-        "december",
-    ], start=1)
+    for nr, name in enumerate(
+        [
+            "januari",
+            "februari",
+            "maart",
+            "april",
+            "mei",
+            "juni",
+            "juli",
+            "augustus",
+            "september",
+            "oktober",
+            "november",
+            "december",
+        ],
+        start=1,
+    )
 }
 
 MONTHS_SHORT = {
     name: nr
-    for nr, name in enumerate([
-        "jan",
-        "feb",
-        "mrt",  # ← This one is not the first three letters.
-        "apr",
-        "mei",
-        "jun",
-        "jul",
-        "aug",
-        "sep",
-        "okt",
-        "nov",
-        "dec",
-    ], start=1)
+    for nr, name in enumerate(
+        [
+            "jan",
+            "feb",
+            "mrt",  # ← This one is not the first three letters.
+            "apr",
+            "mei",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "okt",
+            "nov",
+            "dec",
+        ],
+        start=1,
+    )
 }
 
 
 @dataclass
 class Transaction:
-    """Dataclass for each of the transactions from ICS credit card PDF files.
-    """
+    """Dataclass for each of the transactions from ICS credit card PDF files."""
 
     # The last four digits of the card.
     card_number: int
@@ -76,12 +81,17 @@ class Transaction:
     @property
     def foreign_amount_formatted(self):
         """The amount of money, formatted in a simple way."""
-        return money_format(self.foreign_amount) if self.foreign_amount is not None else ""
+        if self.foreign_amount is None:
+            return ""
+        else:
+            return money_format(self.foreign_amount)
 
     @property
     def foreign_currency_code(self):
-        return self.foreign_amount.currency.code if self.foreign_amount is not None else ""
-
+        if self.foreign_amount is None:
+            return ""
+        else:
+            return self.foreign_amount.currency.code
 
     @property
     def as_json_like(self):
@@ -200,14 +210,14 @@ def get_transactions_from_pages(pages):
     # This also involves properly converting the strings to a better format.
     statement_date = None
     table = []
-    for (nr, page) in enumerate(pages, start=1):
-        # Sanity check, 
+    for nr, page in enumerate(pages, start=1):
+        # Sanity check.
         assert nr == page.page_nr, "Pages must be in order."
 
         if nr == 1:
             statement_date = page.date
         else:
-            # Sanity check, 
+            # Sanity check.
             assert statement_date == page.date, "All pages must have the same date."
 
         # Converting each row, and appending to our accumulator table.
@@ -215,11 +225,11 @@ def get_transactions_from_pages(pages):
             if len(raw_row[0]) > Page.COLUMNS[0].max_length:
                 # Special case for text that expands across all columns.
                 assert all(t.strip() == "" for t in raw_row[1:])
-                row = [ raw_row[0].strip() ]
+                row = [raw_row[0].strip()]
             else:
                 # Converting each cell, if the cell is not empty.
                 row = [
-                    page.convert_cell_text(cell, col.convert_method) if cell.strip() else ""
+                    page.convert_cell_text(cell, col.convert_method)
                     for (cell, col) in zip(raw_row, Page.COLUMNS)
                 ]
             table.append(row)
@@ -241,7 +251,7 @@ def get_transactions_from_pages(pages):
             card_number = re.match(r"Uw Card met als laatste vier cijfers ([0-9]+)", first[0]).group(1)
             card_name = second[0]
         elif len(first) == 9 and len(second) in [0, 9]:
-            if first[5] == first[6] == '' and len(second) == 0:
+            if first[5] == first[6] == "" and len(second) == 0:
                 # Single-row transaction.
                 yield Transaction(
                     card_number=card_number,  # I'm discarding the card name.
@@ -253,8 +263,17 @@ def get_transactions_from_pages(pages):
                     exchange_rate=None,
                 )
             elif first[5] and first[6] and len(second) == 9:
-                # Sanity checks
-                assert second[0] == second[1] == second[4] == second[5] == second[6] == second[7] == second[8] == ""
+                # Sanity checks.
+                assert (
+                    ""
+                    == second[0]
+                    == second[1]
+                    == second[4]
+                    == second[5]
+                    == second[6]
+                    == second[7]
+                    == second[8]
+                )
                 assert second[2] == "Wisselkoers {}".format(first[6])
 
                 # Double-row transaction (foreign currency).
@@ -299,7 +318,7 @@ class Page:
         TableColumn(interval(401, 440), 8, "Bedrag in vreemde valuta", "convert_amount"),
         TableColumn(interval(444, 446), 3, "Currency code", None),
         TableColumn(interval(478, 530), 8, "Bedrag in euro's", "convert_amount"),
-        TableColumn(interval(535, 539), 3, "Bij/Af", "convert_bij_af",),
+        TableColumn(interval(535, 539), 3, "Bij/Af", "convert_bij_af"),
     ]
 
     def __post_init__(self):
@@ -425,11 +444,20 @@ class Page:
         '+'
         >>> page.convert_cell_text(" Af ", "convert_bij_af")
         '-'
+        >>> page.convert_cell_text("  ", "convert_amount")
+        ''
+        >>> page.convert_cell_text("  ", None)
+        ''
+        >>> page.convert_cell_text("  ", "convert_bij_af")
+        ''
         """
-        if method is None:
-            return text.strip()
+        text = text.strip()
+        if text == "":
+            return ""
+        elif method is None:
+            return text
         else:
-            return getattr(self, method)(text.strip())
+            return getattr(self, method)(text)
 
     @property
     def table_as_list(self):
@@ -484,10 +512,12 @@ class Page:
                 lines.append(row[0].ljust(total_width if padding else 0, " "))
             else:
                 # Normal case, each column is well-behaved.
-                lines.append(sep.join(
-                    cell.ljust(self.COLUMNS[i].max_length if padding else 0, " ")
-                    for (i, cell) in enumerate(row)
-                ))
+                lines.append(
+                    sep.join(
+                        cell.ljust(self.COLUMNS[i].max_length if padding else 0, " ")
+                        for (i, cell) in enumerate(row)
+                    )
+                )
         return "\n".join(prefix + line + suffix for line in lines)
 
     def visitor(self, text, cm, tm, font_dict, font_size):
@@ -499,13 +529,15 @@ class Page:
 
         def print_debug():
             print("DEBUG: {!r}".format(self))
-            print("DEBUG: {font_size!s:4} {cm!s:36} {tm!s:36} {text!r}".format(
-                cm=cm,  # Current user matrix.
-                tm=tm,  # Text matrix.
-                # font_dict=font_dict,  # I don't care.
-                font_size=font_size,
-                text=text,
-            ))
+            print(
+                "DEBUG: {font_size!s:4} {cm!s:36} {tm!s:36} {text!r}".format(
+                    cm=cm,  # Current user matrix.
+                    tm=tm,  # Text matrix.
+                    # font_dict=font_dict,  # I don't care.
+                    font_size=font_size,
+                    text=text,
+                )
+            )
             return ""
 
         if text.strip() == "":
@@ -517,31 +549,32 @@ class Page:
             return
 
         if re.match(
-            "|".join([
-                r"Uw betalingen aan International Card Services BV zijn bijgewerkt",
-
-                r"Het totale saldo ad.*zal omstreeks",
-                r"(machtigingsnummer )?E[0-9]+ worden geïncasseerd",
-
-                r"Wilt u een overboeking doen naar uw Card-rekening",
-                r"Diemen. Vermeld bij uw betaling altijd uw ICS-klantnummer",
-
-                r"Nu beschikbaar: Apple Pay! Voeg eenvoudig uw Card aan uw Apple Wallet toe in onze app.",
-
-                # Als u online een product besteld heeft, bent u er natuurlijk zuinig op. Maar een ongeluk zit in een klein hoekje. Betaal daarom altijd met uw ABN AMRO creditcard. Want dan heeft u een Aankoopverzekering. Kijk voor meer informatie en de voorwaarden op www.zekermetjecreditcard.nl.
-                r"Als u online een product besteld heeft, bent u er natuurlijk",
-                r"zuinig op. Maar een ongeluk zit in een klein hoekje",
-                r"daarom altijd met uw ABN AMRO creditcard",
-                r"een Aankoopverzekering. Kijk voor meer informatie",
-                r"voorwaarden op www.zekermetjecreditcard.nl",
-            ]),
+            "|".join(
+                [
+                    # This text shows up every month:
+                    r"Uw betalingen aan International Card Services BV zijn bijgewerkt",
+                    r"Het totale saldo ad.*zal omstreeks",
+                    r"(machtigingsnummer )?E[0-9]+ worden geïncasseerd",
+                    # This text used to show up, but not anymore:
+                    r"Wilt u een overboeking doen naar uw Card-rekening",
+                    r"Diemen. Vermeld bij uw betaling altijd uw ICS-klantnummer",
+                    # Advertisement:
+                    r"Nu beschikbaar: Apple Pay! Voeg eenvoudig uw Card aan uw Apple Wallet toe in onze app.",
+                    # Als u online een product besteld heeft, bent u er natuurlijk zuinig op. Maar een ongeluk zit in een klein hoekje. Betaal daarom altijd met uw ABN AMRO creditcard. Want dan heeft u een Aankoopverzekering. Kijk voor meer informatie en de voorwaarden op www.zekermetjecreditcard.nl.
+                    r"Als u online een product besteld heeft, bent u er natuurlijk",
+                    r"zuinig op. Maar een ongeluk zit in een klein hoekje",
+                    r"daarom altijd met uw ABN AMRO creditcard",
+                    r"een Aankoopverzekering. Kijk voor meer informatie",
+                    r"voorwaarden op www.zekermetjecreditcard.nl",
+                ]
+            ),
             text,
         ):
             # Useless messages.
             return
 
         # Sanity check, guarding ourselves against future PDF changes.
-        assert font_size == 8.0, "This code expects all text to have the same size." + print_debug()
+        assert font_size == 8.0, "This code expects the same font size for all text." + print_debug()
 
         # cm is the current user matrix.
         # tm is the text matrix.
@@ -556,7 +589,7 @@ class Page:
         # ICS company address and other information about that company.
         y_company_info = interval(755, 9999) if self.nr == 1 else interval(0, 0)
         # Date, number of pages, etc.
-        y_statement_info = interval(665 , 721) if self.nr == 1 else interval(665 , 721)
+        y_statement_info = interval(665, 721) if self.nr == 1 else interval(665, 721)
         # The list of transactions.
         y_main_table = interval(126, 645) if self.nr == 1 else interval(0, 645)
         # Credit limit and the minimal payment.
@@ -569,8 +602,8 @@ class Page:
         elif y in y_statement_info:
             # Y↴  X→60.0            156.22   177                  272.86   294             391.22   411 420         507.22
             #     ┌─────────────────────── ┌──────────────────────────── ┌─────────────────────── ┌───────────────────────
-            # 720 │ Datum                  │ ICS-klantnummer             │ Volgnummer             │ Bladnummer            
-            # 709 │ 1 januari 2024         │ 12345678901                 │ 1                      │ 2 van 2               
+            # 720 │ Datum                  │ ICS-klantnummer             │ Volgnummer             │ Bladnummer
+            # 709 │ 1 januari 2024         │ 12345678901                 │ 1                      │ 2 van 2
             #     ┌─────────────────────── ┌──────────────────────────── ┌─────────────────────── ┌───────────────────────
             # 696 │ Vorig openstaand saldo │ Totaal ontvangen betalingen │ Totaal nieuwe uitgaven │ Nieuw openstaand saldo
             # 686 │ € 123,00            Af │ € 123,00                Bij │ € 456,00            Af │ € 456,00            Af
@@ -622,13 +655,13 @@ class Page:
 
         else:
             # Sanity check, in case the PDF format changes.
-            assert False, "The Y={} coordinate should have matched one of the ranges.".format(y) + print_debug()
+            assert False, "Y={} should have matched one of the ranges.".format(y) + print_debug()
 
 
 def read_ics_pdf(filename):
     reader = PdfReader(filename)
     pages = []
-    for (nr, page) in enumerate(reader.pages, start=1):
+    for nr, page in enumerate(reader.pages, start=1):
         p = Page(nr)
         pages.append(p)
         # Ignoring the returned string from extract_text().

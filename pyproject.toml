@@ -34,3 +34,8 @@ Homepage = "https://github.com/denilsonsa/abn-amro-statement-parser"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.black]
+# Increasing from the default 88.
+# 100 is probably enough too.
+line-length = 104
