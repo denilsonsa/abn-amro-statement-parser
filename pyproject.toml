@@ -3,7 +3,7 @@ name = "abn-amro-statement-parser"
 version = "0.9.1"
 description = "Parser for the Dutch ABN AMRO bank transactions"
 keywords = ["ABN AMRO", "bank statement", "bank transactions", "bank mutations", "TSV", "credit card"]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "py-moneyed",
 
