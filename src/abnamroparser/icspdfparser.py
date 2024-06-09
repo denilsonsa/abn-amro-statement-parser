@@ -381,12 +381,33 @@ class Page:
         datetime.date(2023, 4, 8)
         >>> page.convert_date("8 apr")
         datetime.date(2023, 4, 8)
+
+        # Leap year
+        >>> page = Page(1)
+        >>> page.date = datetime.date(2024, 1, 1)
+        >>> page.convert_date("29 feb")
+        datetime.date(2024, 2, 29)
+
+        # Leap year
+        >>> page = Page(1)
+        >>> page.date = datetime.date(2024, 4, 1)
+        >>> page.convert_date("29 feb")
+        datetime.date(2024, 2, 29)
         """
         dd, mmm = text.split()
         d = int(dd)
         m = MONTHS_SHORT[mmm]
+
         y1 = self.date.year
         y2 = self.date.year - 1
+
+        # Leap year
+        if d == 29 and m == 2:
+            for y in [y1, y2]:
+                try:
+                    return datetime.date(y, m, d)
+                except ValueError:
+                    pass
 
         dt1 = datetime.date(y1, m, d)
         dt2 = datetime.date(y2, m, d)
