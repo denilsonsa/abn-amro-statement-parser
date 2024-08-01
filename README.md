@@ -183,7 +183,7 @@ The [Creditcard Online](https://www.icscards.nl/abnamrogb/login) self-service we
 
 Sample filename: `Statement-01234567890-2023-11.pdf`
 
-The text in those files is easily extractable thanks to the [pypdf](https://github.com/py-pdf/pypdf) library.
+Use [icspdfparser](src/abnamroparser/icspdfparser.py) to parse this kind of file. The text in those files is easily extractable thanks to the [pypdf](https://github.com/py-pdf/pypdf) library.
 
 ### Rant about PDF file sizes
 
