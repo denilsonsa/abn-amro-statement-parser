@@ -14,7 +14,7 @@ Consider using a [virtual environment](https://docs.python.org/3/library/venv.ht
 pip install git+https://github.com/denilsonsa/abn-amro-statement-parser.git
 ```
 
-Alternatively, you can manually download any module from the [abnamroparser/](abnamroparser/) directory and place it wherever you want.
+Alternatively, you can manually download any module from the [abnamroparser/](src/abnamroparser/) directory and place it wherever you want.
 
 ```python
 from abnamroparser import tsvparser
@@ -110,7 +110,7 @@ The date and time of the download is part of the filename, following the `TXT%y%
 
 It is a tab-separated file without any headers. The columns are the same as the XLS Excel file, but in a slightly different order.
 
-Use [tsvparser](abnamroparser/tsvparser.py) to parse this kind of file.
+Use [tsvparser](src/abnamroparser/tsvparser.py) to parse this kind of file.
 
 ### MT940
 
