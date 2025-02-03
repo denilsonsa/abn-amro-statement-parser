@@ -251,7 +251,7 @@ def rejoin_description(s):
         parts = re.findall(r".{1,64} ?", s[33:].rstrip())
         assert all(
             len(p) == 65 for p in parts[:-1]
-        ), "Expected all parts to have exactly 65 chars (except that last one)"
+        ), "Expected all parts to have exactly 65 chars (except that last one). Got: ${!r}".format(s)
         return "".join([head, *[p[:64] for p in parts]])
 
 
