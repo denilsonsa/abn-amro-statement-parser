@@ -304,9 +304,9 @@ class Page:
 
     # Description of each of the columns from the main table.
     COLUMNS = [
-        # dd mmm
-        TableColumn(interval(59, 62), 6, "Datum transactie", "convert_date"),
-        TableColumn(interval(102, 106), 6, "Datum boeking", "convert_date"),
+        # "dd mmm" or "dd mmm."
+        TableColumn(interval(59, 62), 7, "Datum transactie", "convert_date"),
+        TableColumn(interval(102, 106), 7, "Datum boeking", "convert_date"),
         # The first description column is usually up to 22 characters,
         # but special strings go over that limit:
         # "GEINCASSEERD VORIG SALDO"
@@ -333,7 +333,11 @@ class Page:
         >>> page.date = datetime.date(2023, 1, 1)
         >>> page.convert_date("01 jan")
         datetime.date(2023, 1, 1)
+        >>> page.convert_date("01 jan.")
+        datetime.date(2023, 1, 1)
         >>> page.convert_date("1 jan")
+        datetime.date(2023, 1, 1)
+        >>> page.convert_date("1 jan.")
         datetime.date(2023, 1, 1)
         >>> page.convert_date("31 dec")
         datetime.date(2022, 12, 31)
@@ -395,6 +399,9 @@ class Page:
         datetime.date(2024, 2, 29)
         """
         dd, mmm = text.split()
+        if mmm.endswith('.'):
+            # Starting on 2025-03, the months sometimes have a trailing dot.
+            mmm = mmm[:-1]
         d = int(dd)
         m = MONTHS_SHORT[mmm]
 
@@ -457,6 +464,8 @@ class Page:
         >>> page.date = datetime.date(2023, 7, 1)
         >>> page.convert_cell_text(" 20 jun ", "convert_date")
         datetime.date(2023, 6, 20)
+        >>> page.convert_cell_text(" 20 jun. ", "convert_date")
+        datetime.date(2023, 6, 20)
         >>> page.convert_cell_text(" 9.876,54 ", "convert_amount")
         '9876.54'
         >>> page.convert_cell_text(" foobar ", None)
@@ -494,42 +503,45 @@ class Page:
         ...     789: ["09 dec", "09 dec", "GEINCASSEERD VORIG SALDO", "", "", "", "", "500,00", "Bij"],
         ...     678: ["Uw Card met als laatste vier cijfers 1234", "", "", "", "", "", "", "", ""],
         ...     567: ["J SMITH VAN DE FOOBAR", "", "", "", "", "", "", "", ""],
-        ...     456: ["02 jan", "03 jan", "Description here", "Foobar", "NLD", "", "", "100,00", "Af"],
+        ...     456: ["01 jan.", "01 jan.", "Description here", "Foobar", "NLD", "", "", "100,00", "Af"],
+        ...     444: ["02 jan", "03 jan", "Description here", "Foobar", "NLD", "", "", "100,00", "Af"],
         ...     345: ["03 jan", "03 jan", "Foreign purchase", "Whatever", "USA", "6,05", "USD", "5,59", "Af"],
         ...     234: ["", "", "Wisselkoers USD", "1,08229", "", "", "", "", ""],
         ...     123: ["04 jan", "04 jan", "Blah blah blah", "Fizzbuzz", "LUX", "", "", "6,99", "Af"],
         ... }
         >>> print(page.table_as_string())
-        |09 dec|09 dec|GEINCASSEERD VORIG SALDO|             |   |        |   |500,00  |Bij|
-        |Uw Card met als laatste vier cijfers 1234                                         |
-        |J SMITH VAN DE FOOBAR                                                             |
-        |02 jan|03 jan|Description here        |Foobar       |NLD|        |   |100,00  |Af |
-        |03 jan|03 jan|Foreign purchase        |Whatever     |USA|6,05    |USD|5,59    |Af |
-        |      |      |Wisselkoers USD         |1,08229      |   |        |   |        |   |
-        |04 jan|04 jan|Blah blah blah          |Fizzbuzz     |LUX|        |   |6,99    |Af |
+        |09 dec |09 dec |GEINCASSEERD VORIG SALDO|             |   |        |   |500,00  |Bij|
+        |Uw Card met als laatste vier cijfers 1234                                           |
+        |J SMITH VAN DE FOOBAR                                                               |
+        |01 jan.|01 jan.|Description here        |Foobar       |NLD|        |   |100,00  |Af |
+        |02 jan |03 jan |Description here        |Foobar       |NLD|        |   |100,00  |Af |
+        |03 jan |03 jan |Foreign purchase        |Whatever     |USA|6,05    |USD|5,59    |Af |
+        |       |       |Wisselkoers USD         |1,08229      |   |        |   |        |   |
+        |04 jan |04 jan |Blah blah blah          |Fizzbuzz     |LUX|        |   |6,99    |Af |
         >>> print(page.table_as_string(sep='", "', prefix='["', suffix='"],', padding=False))
         ["09 dec", "09 dec", "GEINCASSEERD VORIG SALDO", "", "", "", "", "500,00", "Bij"],
         ["Uw Card met als laatste vier cijfers 1234"],
         ["J SMITH VAN DE FOOBAR"],
+        ["01 jan.", "01 jan.", "Description here", "Foobar", "NLD", "", "", "100,00", "Af"],
         ["02 jan", "03 jan", "Description here", "Foobar", "NLD", "", "", "100,00", "Af"],
         ["03 jan", "03 jan", "Foreign purchase", "Whatever", "USA", "6,05", "USD", "5,59", "Af"],
         ["", "", "Wisselkoers USD", "1,08229", "", "", "", "", ""],
         ["04 jan", "04 jan", "Blah blah blah", "Fizzbuzz", "LUX", "", "", "6,99", "Af"],
         >>> print(page.table_as_string(sep="│", prefix="║", suffix="║", padding=True))
-        ║09 dec│09 dec│GEINCASSEERD VORIG SALDO│             │   │        │   │500,00  │Bij║
-        ║Uw Card met als laatste vier cijfers 1234                                         ║
-        ║J SMITH VAN DE FOOBAR                                                             ║
-        ║02 jan│03 jan│Description here        │Foobar       │NLD│        │   │100,00  │Af ║
-        ║03 jan│03 jan│Foreign purchase        │Whatever     │USA│6,05    │USD│5,59    │Af ║
-        ║      │      │Wisselkoers USD         │1,08229      │   │        │   │        │   ║
-        ║04 jan│04 jan│Blah blah blah          │Fizzbuzz     │LUX│        │   │6,99    │Af ║
+        ║09 dec │09 dec │GEINCASSEERD VORIG SALDO│             │   │        │   │500,00  │Bij║
+        ║Uw Card met als laatste vier cijfers 1234                                           ║
+        ║J SMITH VAN DE FOOBAR                                                               ║
+        ║01 jan.│01 jan.│Description here        │Foobar       │NLD│        │   │100,00  │Af ║
+        ║02 jan │03 jan │Description here        │Foobar       │NLD│        │   │100,00  │Af ║
+        ║03 jan │03 jan │Foreign purchase        │Whatever     │USA│6,05    │USD│5,59    │Af ║
+        ║       │       │Wisselkoers USD         │1,08229      │   │        │   │        │   ║
+        ║04 jan │04 jan │Blah blah blah          │Fizzbuzz     │LUX│        │   │6,99    │Af ║
         """
         total_width = sum(c.max_length for c in self.COLUMNS) + len(self.COLUMNS) - 1
         lines = []
         for row in self.table_as_list:
-            if len(row[0]) > self.COLUMNS[0].max_length:
+            if row[0] != "" and all(t == "" for t in row[1:]):
                 # Special case for text that expands across all columns.
-                assert all(t == "" for t in row[1:])
                 lines.append(row[0].ljust(total_width if padding else 0, " "))
             else:
                 # Normal case, each column is well-behaved.
