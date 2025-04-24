@@ -399,7 +399,7 @@ class Page:
         datetime.date(2024, 2, 29)
         """
         dd, mmm = text.split()
-        if mmm.endswith('.'):
+        if mmm.endswith("."):
             # Starting on 2025-03, the months sometimes have a trailing dot.
             mmm = mmm[:-1]
         d = int(dd)
