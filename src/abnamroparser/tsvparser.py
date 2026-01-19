@@ -749,7 +749,7 @@ def parse_description(s):
 
     >>> test_it(" ".join([
     ...     "BEA,BETAALPAS                   ",
-    ...     "VALINSOPAY NL                   NR:01234567,2026-01-13/14:15     ",
+    ...     "VALINSOPAY NL                   NR:01234567,2026-01-13/14:15    ",
     ...     "WIJK EN AALBU,NLD               ",
     ... ]))  # doctest: +ELLIPSIS
     Unexpected format! ...
