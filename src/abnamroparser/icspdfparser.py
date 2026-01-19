@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from moneyed import Currency, Money
 from pypdf import PdfReader
 
-
 MONTHS_LONG = {
     name: nr
     for nr, name in enumerate(
