@@ -271,6 +271,25 @@ def parse_nr_datetime(s):
     return datetime.datetime(2000 + yy, mm, dd, HH, MM)
 
 
+def parse_iso_datetime(s):
+    """Given a ISO-like datetime string, returns a proper datetime object.
+
+    >>> parse_iso_datetime("2026-12-31/23:59")
+    datetime.datetime(2026, 12, 31, 23, 59)
+    >>> parse_iso_datetime("2026-12-31-23:59")
+    datetime.datetime(2026, 12, 31, 23, 59)
+    >>> parse_iso_datetime("2026-12-31-23-59")
+    datetime.datetime(2026, 12, 31, 23, 59)
+    >>> parse_iso_datetime("2026-12-31T23-59")
+    datetime.datetime(2026, 12, 31, 23, 59)
+    >>> parse_iso_datetime("2026-12-31T23:59")
+    datetime.datetime(2026, 12, 31, 23, 59)
+    """
+    parts = re.split("[-:./T]", s.strip())
+    yyyy, mm, dd, HH, MM = [int(p) for p in parts]
+    return datetime.datetime(yyyy, mm, dd, HH, MM)
+
+
 def parse_description(s):
     r"""Returns a dict of the description, parsed into many fields.
 
@@ -751,8 +770,15 @@ def parse_description(s):
     ...     "BEA,BETAALPAS                   ",
     ...     "VALINSOPAY NL                   NR:01234567,2026-01-13/14:15    ",
     ...     "WIJK EN AALBU,NLD               ",
-    ... ]))  # doctest: +ELLIPSIS
-    Unexpected format! ...
+    ... ]))
+    {
+      "NR": "01234567",
+      "Naam": "VALINSOPAY NL",
+      "datetime": "2026-01-13T14:15:00",
+      "location": "WIJK EN AALBU,NLD",
+      "suffix": "",
+      "type": "BEA,BETAALPAS"
+    }
 
     """
     if s.startswith("/"):
@@ -816,7 +842,6 @@ def parse_description(s):
                 "location": location.rstrip(),
                 "suffix": suffix.rstrip(),
             }
-
         elif re.match(r"^(BEA|GEA), ", head):
             # Newer format for payments and ATM.
             name_and_card = tail[0:32]
@@ -834,6 +859,23 @@ def parse_description(s):
                 "NR": nr,
                 "Naam": name.rstrip(),
                 "card": pas.rstrip(),
+                "location": location.rstrip(),
+                "suffix": suffix.rstrip(),
+            }
+        elif re.match(r"^BEA,BETAALPAS", head):
+            name = tail[0:32]  # Should be "VALINSOPAY NL"
+            nr_and_date = tail[32:64]
+            location = tail[64:96]
+            suffix = tail[96:]  # Should be empty
+
+            nr, dtstr = re.fullmatch(r"^NR:([^, ]+)[, ]+([-0-9./:]+) *", nr_and_date).groups()
+            dt = parse_iso_datetime(dtstr)
+
+            return {
+                "type": head,
+                "datetime": dt.isoformat(),
+                "NR": nr,
+                "Naam": name.rstrip(),
                 "location": location.rstrip(),
                 "suffix": suffix.rstrip(),
             }
