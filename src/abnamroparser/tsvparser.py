@@ -367,6 +367,23 @@ def parse_description(s):
       "Omschrijving": "B20230101X00ABCD012345678901 0123456789012345 Fizzbuzz Foo Bar NL02ABNA1234567890 Tikkie Zakelijk",
       "type": "SEPA iDEAL"
     }
+    >>> test_it("".join([
+    ...     "/TRTP/iDEAL/Wero",
+    ...     "/IBAN/NL01ABNA0123456789",
+    ...     "/BIC/ABNANL2A",
+    ...     "/NAME/Tikkie Zakelijk",
+    ...     "/REMI/B20230101X00ABCD012345678901 0123456789012345 Fizzbuzz Foo Bar NL02ABNA1234567890 Tikkie Zakelijk",
+    ...     "/EREF/01-01-2023 13:37 0123456789012345                                               ",
+    ... ]))
+    {
+      "BIC": "ABNANL2A",
+      "IBAN": "NL01ABNA0123456789",
+      "Kenmerk": "01-01-2023 13:37 0123456789012345",
+      "Naam": "Tikkie Zakelijk",
+      "Omschrijving": "B20230101X00ABCD012345678901 0123456789012345 Fizzbuzz Foo Bar NL02ABNA1234567890 Tikkie Zakelijk",
+      "type": "SEPA iDEAL"
+    }
+
 
     Everything that is not slash-separated has extra spaces added every 32 or
     64 characters.
@@ -469,10 +486,27 @@ def parse_description(s):
 
     SEPA (Single Euro Payments Area) is for (online) bank transfers.
     They can be single payments over iDEAL (mostly for online purchases),
-    or simple bank transfers, or subscription payments.
+    or simple bank transfers, or subscription payments. As of 2026, iDEAL is
+    being rebranded as iDEAL/Wero.
 
     >>> test_it(" ".join([
     ...     "SEPA iDEAL                      ",
+    ...     "IBAN: NL01RABO0123456789        BIC: RABONL2U                   ",
+    ...     "Naam: Next to Pay via Mollie    Omschrijving: M01234567ABCDE0F 0",
+    ...     "123456789012345 Foobar Pizza Delivery Order 123456              ",
+    ...     "Kenmerk: 31-12-2023 17:01 0123456789012345                      ",
+    ...     "                                ",
+    ... ]))
+    {
+      "BIC": "RABONL2U",
+      "IBAN": "NL01RABO0123456789",
+      "Kenmerk": "31-12-2023 17:01 0123456789012345",
+      "Naam": "Next to Pay via Mollie",
+      "Omschrijving": "M01234567ABCDE0F 0123456789012345 Foobar Pizza Delivery Order 123456",
+      "type": "SEPA iDEAL"
+    }
+    >>> test_it(" ".join([
+    ...     "SEPA iDEAL/Wero                 ",
     ...     "IBAN: NL01RABO0123456789        BIC: RABONL2U                   ",
     ...     "Naam: Next to Pay via Mollie    Omschrijving: M01234567ABCDE0F 0",
     ...     "123456789012345 Foobar Pizza Delivery Order 123456              ",
@@ -804,7 +838,7 @@ def parse_description(s):
             "ID": "",
         }
         data = {key_map[k]: v.rstrip() for (k, v) in batched(parts, 2) if key_map[k] != ""}
-        if data["type"] == "iDEAL":
+        if data["type"] in {"iDEAL", "iDEAL/Wero"}:
             # To make it consistent with the other format.
             data["type"] = "SEPA iDEAL"
         return {
@@ -880,6 +914,10 @@ def parse_description(s):
                 "suffix": suffix.rstrip(),
             }
         elif re.match(r"^SEPA ", head):
+            if head in {"SEPA iDEAL/Wero"}:
+                # To make it consistent with the other format.
+                head = "SEPA iDEAL"
+
             # Online transactions.
             parts = []
             for thirtytwo in re.findall(r".{1,32}", tail):
