@@ -778,6 +778,19 @@ def parse_description(s):
       "suffix": "",
       "type": "BEA, Google Pay"
     }
+    >>> test_it(" ".join([
+    ...     "ECOM,BETAALPAS                  ",
+    ...     "UBER   * EATS PENDING           NR:12341234,25.10.26/18:59      ",
+    ...     "AMSTERDAM, LAND: NLD            KAARTNUMMER:**9973",
+    ... ]))
+    {
+      "NR": "12341234",
+      "Naam": "UBER   * EATS PENDING",
+      "datetime": "2026-10-25T18:59:00",
+      "location": "AMSTERDAM, LAND: NLD",
+      "suffix": "KAARTNUMMER:**9973",
+      "type": "ECOM,BETAALPAS"
+    }
 
     This is a snowflake, one-of-a-kind transaction.
     It's the only transaction I found that had backslashes.
@@ -896,14 +909,17 @@ def parse_description(s):
                 "location": location.rstrip(),
                 "suffix": suffix.rstrip(),
             }
-        elif re.match(r"^BEA,BETAALPAS", head):
+        elif re.match(r"^(BEA|ECOM),BETAALPAS", head):
             name = tail[0:32]  # Should be "VALINSOPAY NL"
             nr_and_date = tail[32:64]
             location = tail[64:96]
             suffix = tail[96:]  # Should be empty
 
             nr, dtstr = re.fullmatch(r"^NR:([^, ]+)[, ]+([-0-9./:]+) *", nr_and_date).groups()
-            dt = parse_iso_datetime(dtstr)
+            if re.match(r"^\d{4}-", dtstr):
+                dt = parse_iso_datetime(dtstr)
+            else:
+                dt = parse_nr_datetime(dtstr)
 
             return {
                 "type": head,
